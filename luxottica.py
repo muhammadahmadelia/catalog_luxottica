@@ -181,31 +181,54 @@ class Luxottica_Scraper:
 
     def login(self, username: str, password: str) -> bool:
         login_flag = False
-        try:
-            self.accept_cookies_before_login()
-            if self.wait_until_element_found(10, 'xpath', '//input[@name="username"]'):
-                self.browser.find_element(By.XPATH, '//input[@name="username"]').send_keys(username)
-                sleep(0.2)
-                if self.wait_until_element_found(20, 'xpath', '//input[@name="password"]'):
-                    self.browser.find_element(By.XPATH, '//input[@name="password"]').send_keys(password)
-                    sleep(0.2)
-                    self.browser.find_element(By.XPATH, '//button[@data-element-id="LoginButton"]').click()
-                    self.wait_until_browsing()
-                    for _ in range(0, 100):
+        while not login_flag:
+            try:
+                self.accept_cookies_before_login()
+                if self.wait_until_element_found(10, 'xpath', '//input[@id="signInName"]'):
+                    for _ in range(0, 30):
                         try:
-                            a = self.browser.find_element(By.CSS_SELECTOR, 'div[class^="AccountMenu__MenuContainer"]')
-                            if a: 
-                                login_flag = True
-                                self.accept_cookies_after_login()
-                                break
-                            else: sleep(0.3)
+                            self.browser.find_element(By.XPATH, '//input[@id="signInName"]').send_keys(username)
+                            break
                         except: sleep(0.3)
-                else: print('Password input not found')
-            else: print('Email input not found')
-        except Exception as e:
-            if self.DEBUG: print(f'Exception in login: {str(e)}')
-            else: pass
-        finally: return login_flag
+                    sleep(0.2)
+                    
+                    if self.wait_until_element_found(20, 'xpath', '//button[@id="continue"]'):
+                        for _ in range(0, 30):
+                            try:
+                                self.browser.find_element(By.XPATH, '//button[@id="continue"]').click()
+                                break
+                            except: sleep(0.3)
+
+                        if self.wait_until_element_found(20, 'xpath', '//input[@id="password"]'):
+                            for _ in range(0, 30):
+                                try:
+                                    self.browser.find_element(By.XPATH, '//input[@id="password"]').send_keys(password)
+                                    break
+                                except: sleep(0.5)
+                            sleep(0.2)
+                            self.browser.find_element(By.XPATH, '//button[@id="next"]').click()
+                            self.wait_until_browsing()
+                            for _ in range(0, 100):
+                                try:
+                                    a = self.browser.find_element(By.CSS_SELECTOR, 'div[class^="AccountMenu__MenuContainer"]')
+                                    if a: 
+                                        login_flag = True
+                                        if '/myl-it/it-IT/homepage' in self.browser.current_url:
+                                            self.browser.get('https://my.essilorluxottica.com/myl-it/en-GB/homepage')
+                                        self.accept_cookies_after_login()
+                                        break
+                                    else: sleep(0.3)
+                                except: sleep(0.3)
+                        else: print('Password input not found')
+                else: print('Email input not found')
+            except Exception as e:
+                self.print_logs(f'Exception in login: {str(e)}')
+                if self.DEBUG: print(f'Exception in login: {str(e)}')
+
+            if not login_flag: 
+                self.browser.get(url)
+                self.wait_until_browsing()
+        return login_flag
 
     def open_new_tab(self, url: str) -> None:
         # open category in new tab

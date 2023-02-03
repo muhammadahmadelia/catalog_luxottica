@@ -1,15 +1,10 @@
+
 {
     "brands": [
         {
             "brand": "Prada",
             "code": "PR",
-            "glasses_type": {
-                "sunglasses": true,
-                "sunglasses_kids": false,
-                "eyeglasses": false,
-                "eyeglasses_kids": false,
-                "snowglasses": false
-            }
+            "glasses_type": [ "Sunglasses", "Ski & Snowboard Goggles" ]
         }
     ]
 }

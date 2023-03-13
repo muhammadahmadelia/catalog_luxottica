@@ -2,9 +2,9 @@
 {
     "brands": [
         {
-            "brand": "Prada",
-            "code": "PR",
-            "glasses_type": [ "Sunglasses", "Ski & Snowboard Goggles" ]
+            "brand": "Miu Miu",
+            "code": "MU",
+            "glasses_type": [ "Sunglasses", "Eyeglasses" ]
         }
     ]
 }

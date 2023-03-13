@@ -362,6 +362,8 @@ class Luxottica_Scraper:
             url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/versace'
         elif str(brand).strip().lower() == 'vogue':
             url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/vogue'
+        elif str(brand).strip().lower() == 'miu miu':
+            url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/miu-miu'
         return url 
 
     def close_last_tab(self) -> None:

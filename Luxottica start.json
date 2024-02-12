@@ -2,9 +2,9 @@
 {
     "brands": [
         {
-            "brand": "Miu Miu",
-            "code": "MU",
-            "glasses_type": [ "Sunglasses", "Eyeglasses" ]
+            "brand": "Versace",
+            "code": "VE",
+            "glasses_type":  [ "Sunglasses"]
         }
     ]
 }

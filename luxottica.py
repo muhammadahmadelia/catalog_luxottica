@@ -5,12 +5,12 @@ from time import sleep
 import json
 import glob
 from models.store import Store
-from models.brand import Brand
+# from models.brand import Brand
 from models.product import Product
 from models.metafields import Metafields
 from models.variant import Variant
 from selenium import webdriver
-import chromedriver_autoinstaller
+# import chromedriver_autoinstaller
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -22,7 +22,7 @@ from datetime import datetime
 
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as Imag
-from openpyxl.utils import get_column_letter
+# from openpyxl.utils import get_column_letter
 from PIL import Image
 
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -370,6 +370,10 @@ class Luxottica_Scraper:
             url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/vogue'
         elif str(brand).strip().lower() == 'miu miu':
             url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/miu-miu'
+        elif str(brand).strip().lower() == 'oliver peoples':
+            url = 'https://my.essilorluxottica.com/myl-it/it-IT/preplp/oliver-peoples'
+        elif str(brand).strip().lower() == 'swarovski':
+            url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/sk'
         return url 
 
     def close_last_tab(self) -> None:
@@ -756,9 +760,12 @@ class Luxottica_Scraper:
             metafields.product_size = ', '.join(product_sizes)
             metafields.gtin1 = ', '.join(barcodes)
 
-            # for image360 in self.get_360_images(tokenValue, headers):
-            #     if image360 not in metafields.img_360_urls:
-            #         metafields.img_360_urls = image360
+            # images_360 = self.get_360_images(tokenValue, headers)
+            # if images_360:
+            #     for image360 in images_360:
+            #         if image360 not in metafields.img_360_urls:
+            #             metafields.img_360_urls = image360
+            
             
             product.metafields = metafields
             
@@ -1116,17 +1123,21 @@ def read_data_from_json_file(DEBUG, result_filename: str):
                     # variant.found_status = json_variant['found_status']
                     wholesale_price = str(json_variant['wholesale_price']).strip()
                     listing_price = str(json_variant['listing_price']).strip()
-                    # variant.barcode_or_gtin = str(json_variant['barcode_or_gtin']).strip()
+                    barcode_or_gtin = str(json_variant['barcode_or_gtin']).strip()
                     # variant.size = str(json_variant['size']).strip()
                     # variant.weight = str(json_variant['weight']).strip()
                     # product.variants = variant
                     img_url = img_url.replace('impolicy=MYL_EYE&wid=262', 'impolicy=MYL_EYE&wid=600')
                     image_filename = f'Images/{sku.replace("/", "_")}.jpg'
                     if not os.path.exists(image_filename):
+                        # print(image_filename)
                         image_attachment = download_image(img_url)
                         if image_attachment:
-                            with open(image_filename, 'wb') as f: f.write(image_attachment)
-                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price])
+                            with open(image_filename, 'wb') as f:
+                                for chunk in image_attachment:
+                                    f.write(chunk)
+                            # with open(image_filename, 'wb') as f: f.write(image_attachment)
+                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, img_url])
     except Exception as e:
         if DEBUG: print(f'Exception in read_data_from_json_file: {e}')
         else: pass
@@ -1136,33 +1147,48 @@ def download_image(url):
     image_attachment = ''
     try:
         headers = {
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'accept-Encoding': 'gzip, deflate, br',
-            'accept-Language': 'en-US,en;q=0.9',
-            'cache-Control': 'max-age=0',
-            'sec-ch-ua': '"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
+            'authority': 'myluxottica-im2.luxottica.com',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'accept-language': 'en-US,en;q=0.9',
+            'cache-control': 'max-age=0',
+            # 'if-modified-since': 'Wed, 17 Jan 2024 08:18:34 GMT',
+            # 'if-none-match': '"0x8DBC6B2A2C83730"',
+            'sec-ch-ua': '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
             'sec-fetch-dest': 'document',
             'sec-fetch-mode': 'navigate',
             'sec-fetch-site': 'none',
-            'Sec-Fetch-User': '?1',
+            'sec-fetch-user': '?1',
             'upgrade-insecure-requests': '1',
+            # 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         }
         counter = 0
         while True:
             try:
-                response = requests.get(url=url, headers=headers, timeout=20)
+                response = requests.get(url=url, headers=headers, timeout=50)
                 if response.status_code == 200:
                     # image_attachment = base64.b64encode(response.content)
-                    image_attachment = response.content
+                    # image_attachment = response.content
+                    image_attachment = response
                     break
                 else: print(f'{response.status_code} found for downloading image')
-            except: sleep(0.3)
+            except Exception as e: 
+                print(e)
+                sleep(0.3)
             counter += 1
             if counter == 10: break
     except Exception as e: print(f'Exception in download_image: {str(e)}')
     finally: return image_attachment
+
+def image_download_process(image_filename, image_url):
+    try:  
+        print('Downloading image: ', image_filename)
+        image_attachment = download_image(image_url)
+        if image_attachment:
+            with open(image_filename, 'wb') as f: f.write(image_attachment)
+    except Exception as e:
+        print(f'Exception in image_download_process: {str(e)} for {image_url}')
 
 def saving_picture_in_excel(data: list):
     try:
@@ -1177,7 +1203,8 @@ def saving_picture_in_excel(data: list):
         worksheet.cell(row=1, column=6, value='SKU')
         worksheet.cell(row=1, column=7, value='Wholesale Price')
         worksheet.cell(row=1, column=8, value='Listing Price')
-        worksheet.cell(row=1, column=9, value="Image")
+        worksheet.cell(row=1, column=9, value='UPC')
+        worksheet.cell(row=1, column=10, value="Image")
 
         for index, d in enumerate(data):
             new_index = index + 2
@@ -1189,22 +1216,50 @@ def saving_picture_in_excel(data: list):
             worksheet.cell(row=new_index, column=6, value=d[5])
             worksheet.cell(row=new_index, column=7, value=d[6])
             worksheet.cell(row=new_index, column=8, value=d[7])
+            worksheet.cell(row=new_index, column=9, value=d[8])
+
+            # image_url = d[9]
+            image_filename = f'Images/{d[5].replace("/", "_")}.jpg'
             
-            image = f'Images/{str(d[-3]).replace("/", "_")}.jpg'
-            if os.path.exists(image):
+            # print(image_filename, image_url)
+
+            if os.path.exists(image_filename):
                 try:
-                    im = Image.open(image)
+                    im = Image.open(image_filename)
                     # if image is WebP save it as JPEG and open it again
                     if im.format_description == 'WebP image':
                         im.convert("RGB")
-                        im.save(image, "jpeg")
-                        im = Image.open(image)
+                        im.save(image_filename, "jpeg")
+                        im = Image.open(image_filename)
                         
                     width, height = im.size
                     worksheet.row_dimensions[new_index].height = height
-                    worksheet.add_image(Imag(image), anchor='I'+str(new_index))
+                    worksheet.add_image(Imag(image_filename), anchor='J'+str(new_index))
+                    break
+                except Exception as e: 
+                    pass
+            
+            # image = f'Images/{str(d[-4]).replace("/", "_")}.jpg'
+            # if os.path.exists(image):
+            #     try:
+            #         im = Image.open(image)
+            #         # if image is WebP save it as JPEG and open it again
+            #         if im.format_description == 'WebP image':
+            #             im.convert("RGB")
+            #             im.save(image, "jpeg")
+            #             im = Image.open(image)
+                        
+            #         width, height = im.size
+            #         worksheet.row_dimensions[new_index].height = height
+            #         worksheet.add_image(Imag(image), anchor='J'+str(new_index))
                     
-                except: pass
+            #     except Exception as e: 
+            #         print(d[5], e)
+            #         image_filename = f'Images/{d[-4].replace("/", "_")}.jpg'
+            #         if not os.path.exists(image_filename):
+            #             image_attachment = download_image(img_url)
+            #             if image_attachment:
+            #                 with open(image_filename, 'wb') as f: f.write(image_attachment)
                 
         
         workbook.save('Luxottica Results.xlsx')

@@ -1235,7 +1235,6 @@ def saving_picture_in_excel(data: list):
                     width, height = im.size
                     worksheet.row_dimensions[new_index].height = height
                     worksheet.add_image(Imag(image_filename), anchor='J'+str(new_index))
-                    break
                 except Exception as e: 
                     pass
             

@@ -4,7 +4,14 @@
         {
             "brand": "Versace",
             "code": "VE",
-            "glasses_type":  [ "Sunglasses"]
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/versace",
+            "glasses_type":  [ "Sunglasses", "Eyeglasses"]
+        },
+        {
+            "brand": "Ray-Ban",
+            "code": "RB",
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/ray-ban",
+            "glasses_type":  [ "Sunglasses", "Eyeglasses"]
         }
     ]
 }

@@ -232,7 +232,7 @@ class Luxottica_Scraper:
                             self.wait_until_browsing()
                             for _ in range(0, 100):
                                 try:
-                                    a = self.browser.find_element(By.CSS_SELECTOR, 'div[class^="AccountMenu__MenuContainer"]')
+                                    a = self.browser.find_element(By.XPATH, "//button[contains(text(), 'BRAND')]")
                                     if a: 
                                         login_flag = True
                                         if '/myl-it/it-IT/homepage' in self.browser.current_url:

@@ -51,7 +51,7 @@ class myScrapingThread(threading.Thread):
 
 
 class Luxottica_Scraper:
-    def __init__(self, DEBUG: bool, result_filename: str, logs_filename: str) -> None:
+    def __init__(self, DEBUG: bool, result_filename: str, logs_filename: str, chrome_path: str) -> None:
         self.DEBUG = DEBUG
         self.data = []
         self.result_filename = result_filename
@@ -64,7 +64,8 @@ class Luxottica_Scraper:
         self.chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.args = ["hide_console", ]
         # self.browser = webdriver.Chrome(options=self.chrome_options, service_args=self.args)
-        self.browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.chrome_options)
+        # self.browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.chrome_options)
+        self.browser = webdriver.Chrome(service=ChromeService(chrome_path), options=self.chrome_options)
         pass
 
     def controller(self, store: Store, brands_with_types: list[dict]) -> None:
@@ -931,7 +932,7 @@ class Luxottica_Scraper:
                     for size_without_q in sizes_without_q:
                         if productId == size_without_q['uniqueID']:
                             inventory_quantity = 0
-                            if json_res['inventoryStatus'] == 'Available': inventory_quantity = 1
+                            if str(json_res['x_state']).strip().upper() == 'AVAILABLE': inventory_quantity = 1
                             sizes.append({'title': size_without_q['title'], 'inventory_quantity': inventory_quantity, "UPC": size_without_q['UPC'], "size": size_without_q['size']})
                 
                 properties = {
@@ -1307,8 +1308,15 @@ try:
 
     scrape_time = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
     logs_filename = f'Logs/Logs {scrape_time}.txt'
+
+    chrome_path = ''
+    if not chrome_path:
+        chrome_path = ChromeDriverManager().install()
+        if 'chromedriver.exe' not in chrome_path:
+            chrome_path = str(chrome_path).split('/')[0].strip()
+            chrome_path = f'{chrome_path}\\chromedriver.exe'
     
-    Luxottica_Scraper(DEBUG, result_filename, logs_filename).controller(store, brands)
+    Luxottica_Scraper(DEBUG, result_filename, logs_filename, chrome_path).controller(store, brands)
     
     for filename in glob.glob('Images/*'): os.remove(filename)
     data = read_data_from_json_file(DEBUG, result_filename)

@@ -300,7 +300,7 @@ class Luxottica_Scraper:
                         elif glasses_type == 'Sunglasses Kids': category_css_selector = 'button[data-element-id^="Categories_sunglasses-kids"]'
                         elif glasses_type == 'Eyeglasses': category_css_selector = 'button[data-element-id^="Categories_eyeglasses_"]'
                         elif glasses_type == 'Eyeglasses Kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
-                        elif glasses_type == 'Ski & Snowboard Goggles': category_css_selector = 'button[data-element-id^="Categories_gogglesHelmets"]'
+                        elif glasses_type == 'Ski & Snowboard Goggles': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
                         
                         if self.wait_until_element_found(20, 'css_selector', category_css_selector):
                             element = self.browser.find_element(By.CSS_SELECTOR, category_css_selector)

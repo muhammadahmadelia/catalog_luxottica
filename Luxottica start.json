@@ -2,16 +2,10 @@
 {
     "brands": [
         {
-            "brand": "Versace",
-            "code": "VE",
-            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/versace",
-            "glasses_type":  [ "Sunglasses", "Eyeglasses"]
-        },
-        {
-            "brand": "Ray-Ban",
-            "code": "RB",
-            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/ray-ban",
-            "glasses_type":  [ "Sunglasses", "Eyeglasses"]
+            "brand": "Oakley",
+            "code": "OO",
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/oakley",
+            "glasses_type":  ["Ski & Snowboard Goggles"]
         }
     ]
 }

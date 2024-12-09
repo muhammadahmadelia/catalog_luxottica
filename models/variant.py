@@ -5,7 +5,7 @@ class Variant:
         self.__position = 0
         self.__title = ''
         self.__sku = ''
-        self.__inventory_quantity = 0
+        self.__inventory_status = ''
         self.__found_status = 1
         self.__wholesale_price = ''
         self.__listing_price = ''
@@ -57,12 +57,12 @@ class Variant:
         self.__sku = sku
 
     @property
-    def inventory_quantity(self) -> int:
-        return self.__inventory_quantity
+    def inventory_status(self) -> str:
+        return self.__inventory_status
 
-    @inventory_quantity.setter
-    def inventory_quantity(self, inventory_quantity: int):
-        self.__inventory_quantity = inventory_quantity
+    @inventory_status.setter
+    def inventory_status(self, inventory_status: str):
+        self.__inventory_status = inventory_status
 
     @property
     def found_status(self) -> int:

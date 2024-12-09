@@ -300,8 +300,9 @@ class Luxottica_Scraper:
                         elif glasses_type == 'Sunglasses Kids': category_css_selector = 'button[data-element-id^="Categories_sunglasses-kids"]'
                         elif glasses_type == 'Eyeglasses': category_css_selector = 'button[data-element-id^="Categories_eyeglasses_"]'
                         elif glasses_type == 'Eyeglasses Kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
-                        elif glasses_type == 'Ski & Snowboard Goggles': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
-                        
+                        elif glasses_type == 'Goggles and helmets': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
+                        elif glasses_type == 'Goggles and helmets kids': category_css_selector = 'button[data-element-id^="Categories_children_ViewAll"]'
+
                         if self.wait_until_element_found(20, 'css_selector', category_css_selector):
                             element = self.browser.find_element(By.CSS_SELECTOR, category_css_selector)
                             ActionChains(self.browser).move_to_element(element).perform()
@@ -656,7 +657,7 @@ class Luxottica_Scraper:
                         'position': (index + 1), 
                         'title': variant.title, 
                         'sku': variant.sku, 
-                        'inventory_quantity': variant.inventory_quantity,
+                        'inventory_status': variant.inventory_status,
                         'found_status': variant.found_status,
                         'listing_price': variant.listing_price,
                         'wholesale_price': variant.wholesale_price,
@@ -747,7 +748,7 @@ class Luxottica_Scraper:
                 variant = Variant()
                 variant.title = size['title']
                 variant.sku = f'{product.number} {product.frame_code} {variant.title}'
-                variant.inventory_quantity = size['inventory_quantity']
+                variant.inventory_status = size['inventory_status']
                 variant.found_status = 1
                 variant.barcode_or_gtin = size['UPC']
                 barcodes.append(size['UPC'])
@@ -931,9 +932,10 @@ class Luxottica_Scraper:
                     productId = json_res['productId']
                     for size_without_q in sizes_without_q:
                         if productId == size_without_q['uniqueID']:
-                            inventory_quantity = 0
-                            if str(json_res['x_state']).strip().upper() == 'AVAILABLE': inventory_quantity = 1
-                            sizes.append({'title': size_without_q['title'], 'inventory_quantity': inventory_quantity, "UPC": size_without_q['UPC'], "size": size_without_q['size']})
+                            inventory_status = str(json_res['x_state']).strip()
+                            # if str(json_res['x_state']).strip().upper() == 'AVAILABLE': inventory_quantity = 1
+
+                            sizes.append({'title': size_without_q['title'], 'inventory_status': inventory_status, "UPC": size_without_q['UPC'], "size": size_without_q['size']})
                 
                 properties = {
                     'img_url': img_url,
@@ -1121,7 +1123,7 @@ def read_data_from_json_file(DEBUG, result_filename: str):
                     # variant.title = str(json_variant['title']).strip()
                     sku = str(json_variant['sku']).strip().upper()
                     if '/' in sku: sku = sku.replace('/', '-').strip()
-                    # variant.inventory_quantity = json_variant['inventory_quantity']
+                    inventory_status = json_variant['inventory_status']
                     # variant.found_status = json_variant['found_status']
                     wholesale_price = str(json_variant['wholesale_price']).strip()
                     listing_price = str(json_variant['listing_price']).strip()
@@ -1139,7 +1141,7 @@ def read_data_from_json_file(DEBUG, result_filename: str):
                                 for chunk in image_attachment:
                                     f.write(chunk)
                             # with open(image_filename, 'wb') as f: f.write(image_attachment)
-                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, img_url])
+                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, img_url])
     except Exception as e:
         if DEBUG: print(f'Exception in read_data_from_json_file: {e}')
         else: pass
@@ -1206,7 +1208,8 @@ def saving_picture_in_excel(data: list):
         worksheet.cell(row=1, column=7, value='Wholesale Price')
         worksheet.cell(row=1, column=8, value='Listing Price')
         worksheet.cell(row=1, column=9, value='UPC')
-        worksheet.cell(row=1, column=10, value="Image")
+        worksheet.cell(row=1, column=10, value='Item Status')
+        worksheet.cell(row=1, column=11, value="Image")
 
         for index, d in enumerate(data):
             new_index = index + 2
@@ -1219,6 +1222,7 @@ def saving_picture_in_excel(data: list):
             worksheet.cell(row=new_index, column=7, value=d[6])
             worksheet.cell(row=new_index, column=8, value=d[7])
             worksheet.cell(row=new_index, column=9, value=d[8])
+            worksheet.cell(row=new_index, column=10, value=d[9])
 
             # image_url = d[9]
             image_filename = f'Images/{d[5].replace("/", "_")}.jpg'
@@ -1236,7 +1240,7 @@ def saving_picture_in_excel(data: list):
                         
                     width, height = im.size
                     worksheet.row_dimensions[new_index].height = height
-                    worksheet.add_image(Imag(image_filename), anchor='J'+str(new_index))
+                    worksheet.add_image(Imag(image_filename), anchor='K'+str(new_index))
                 except Exception as e: 
                     pass
             

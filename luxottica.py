@@ -234,10 +234,13 @@ class Luxottica_Scraper:
                             self.wait_until_browsing()
                             for _ in range(0, 100):
                                 try:
-                                    a = self.browser.find_element(By.XPATH, "//button[contains(text(), 'BRAND')]")
+                                    brand_xpath_value = ''
+                                    if '/myl-it/it-IT/homepage' in self.browser.current_url: brand_xpath_value = "//button[contains(text(), 'Brand')]"
+                                    elif '/myl-it/en-GB/homepage' in self.browser.current_url: brand_xpath_value = "//button[contains(text(), 'Brands')]"
+                                    a = self.browser.find_element(By.XPATH, brand_xpath_value)
                                     if a: 
                                         login_flag = True
-                                        if '/myl-it/it-IT/homepage' in self.browser.current_url:
+                                        if '/homepage' in self.browser.current_url:
                                             self.browser.get('https://my.essilorluxottica.com/myl-it/en-GB/homepage')
                                         self.accept_cookies_after_login()
                                         break
@@ -264,15 +267,7 @@ class Luxottica_Scraper:
         brand_url = ''
         for _ in range(0, 10):
             try:
-                # url = self.get_brand_url(brand)
                 if url:
-                    # if url and self.browser.current_url == 'https://my.essilorluxottica.com/myl-it/en-GB/homepage' or 'https://my.essilorluxottica.com/myl-it/en-GB/plp/frames' in self.browser.current_url:
-                    #     self.wait_until_element_found(30, 'xpath', "//span/button[contains(text(),'BRANDS')]")
-                    #     ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'BRANDS')]")).perform()
-                    #     sleep(0.5)
-                    #     self.browser.get(url)
-                    #     self.wait_until_browsing()
-                    #     sleep(5)
 
                     if '/login' in self.browser.current_url:
                         for _ in range(0, 30):
@@ -286,14 +281,13 @@ class Luxottica_Scraper:
                                 elif self.wait_until_element_found(5, 'xpath', 'button[data-element-id^="Categories_sunglasses_ViewAll"]'): break
                             except: sleep(0.5)
                     else:
-                        self.wait_until_element_found(30, 'xpath', "//span/button[contains(text(),'BRANDS')]")
-                        ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'BRANDS')]")).perform()
+                        self.wait_until_element_found(30, 'xpath', "//span/button[contains(text(),'Brands')]")
+                        ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'Brands')]")).perform()
                         sleep(0.5)
                         self.browser.get(url)
                         self.wait_until_browsing()
                         sleep(5)
 
-                    # print(self.browser.current_url, url, self.browser.current_url == url)
                     if self.browser.current_url == url:
                         category_css_selector = ''
                         if glasses_type == 'Sunglasses': category_css_selector = 'button[data-element-id^="Categories_sunglasses_"]'
@@ -325,60 +319,6 @@ class Luxottica_Scraper:
                 self.print_logs(f'Exception in select_category: {e}')
         return brand_url
 
-    # def get_brand_url(self, brand: str) -> str:
-    #     url = ''
-    #     if str(brand).strip().lower() == 'arnette':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/arnette'
-    #     elif str(brand).strip().lower() == 'burberry':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/burberry'
-    #     elif str(brand).strip().lower() == 'bvlgari':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/bvlgari'
-    #     elif str(brand).strip().lower() == 'dolce & gabbana':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/dolce-gabbana'
-    #     elif str(brand).strip().lower() == 'ess':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/ess'
-    #     elif str(brand).strip().lower() == 'emporio armani':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/emporio-armani'
-    #     elif str(brand).strip().lower() == 'giorgio armani':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/giorgio-armani'
-    #     elif str(brand).strip().lower() == 'luxottica':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/luxottica'
-    #     elif str(brand).strip().lower() == 'michael kors':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/michael-kors'
-    #     elif str(brand).strip().lower() == 'oakley':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/oakley'
-    #     elif str(brand).strip().lower() == 'persol':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/persol'
-    #     elif str(brand).strip().lower() == 'polo ralph lauren':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/polo-ralph-lauren'
-    #     elif str(brand).strip().lower() == 'prada':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/prada'
-    #     elif str(brand).strip().lower() == 'prada linea rossa':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/prada-linea-rossa'
-    #     elif str(brand).strip().lower() == 'ralph':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/ralph'
-    #     elif str(brand).strip().lower() == 'ralph lauren':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/ralph-lauren'
-    #     elif str(brand).strip().lower() == 'ray-ban':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/ray-ban'
-    #     elif str(brand).strip().lower() == 'sferoflex':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/sferoflex'
-    #     elif str(brand).strip().lower() == 'valentino':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/valentino'
-    #     elif str(brand).strip().lower() == 'tiffany':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/tiffany'
-    #     elif str(brand).strip().lower() == 'versace':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/versace'
-    #     elif str(brand).strip().lower() == 'vogue':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/vogue'
-    #     elif str(brand).strip().lower() == 'miu miu':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/miu-miu'
-    #     elif str(brand).strip().lower() == 'oliver peoples':
-    #         url = 'https://my.essilorluxottica.com/myl-it/it-IT/preplp/oliver-peoples'
-    #     elif str(brand).strip().lower() == 'swarovski':
-    #         url = 'https://my.essilorluxottica.com/myl-it/en-GB/preplp/sk'
-    #     return url 
-
     def close_last_tab(self) -> None:
         self.browser.close()
         self.browser.switch_to.window(self.browser.window_handles[len(self.browser.window_handles) - 1])
@@ -390,12 +330,6 @@ class Luxottica_Scraper:
                 try:
                     total_sunglasses = str(self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PLPTitle__Section"] > p[class^="CustomText__Text"]').text).strip()
                     if '(' in total_sunglasses:
-                        # if 'Sunglasses' in total_sunglasses: 
-                        #     total_sunglasses = total_sunglasses.replace('Sunglasses', '').replace('(', '').replace(')', '').strip()
-                        # elif 'Eyeglasses' in total_sunglasses: 
-                        #     total_sunglasses = total_sunglasses.replace('Eyeglasses', '').replace('(', '').replace(')', '').strip()
-                        # elif 'Goggles and helmets' in total_sunglasses: 
-                        #     total_sunglasses = total_sunglasses.replace('Goggles and helmets', '').replace('(', '').replace(')', '').strip()
                         total_sunglasses = total_sunglasses.split('(')[-1].strip().replace(')', '').strip()
                         if total_sunglasses: total_products = int(total_sunglasses)
                         else: total_products = 0
@@ -1070,6 +1004,12 @@ class Luxottica_Scraper:
                 break
             else: sleep(1)
 
+def read_file(filename: str):
+    f = open(filename)
+    data = f.read()
+    f.close()
+    return data
+
 def read_data_from_json_file(DEBUG, result_filename: str):
     data = []
     try:
@@ -1270,63 +1210,124 @@ def saving_picture_in_excel(data: list):
         workbook.save('Luxottica Results.xlsx')
     except Exception as e: print(f'Exception in saving_picture_in_excel: {str(e)}')   
 
-
 DEBUG = True
 try:
     pathofpyfolder = os.path.realpath(sys.argv[0])
     # get path of Exe folder
     path = pathofpyfolder.replace(pathofpyfolder.split('\\')[-1], '')
-    # download chromedriver.exe with same version and get its path
-    # if os.path.exists('chromedriver.exe'): os.remove('chromedriver.exe')
-    if os.path.exists('Luxottica Results.xlsx'): os.remove('Luxottica Results.xlsx')
-
-    # chromedriver_autoinstaller.install(path)
     if '.exe' in pathofpyfolder.split('\\')[-1]: DEBUG = False
-    
-    f = open('Luxottica start.json')
-    json_data = json.loads(f.read())
-    f.close()
 
-    brands = json_data['brands']
+    chrome_path = ChromeDriverManager().install()
+    if 'chromedriver.exe' not in chrome_path:
+        chrome_path = str(chrome_path).split('/')[0].strip()
+        chrome_path = f'{chrome_path}\\chromedriver.exe'
 
-    
-    f = open('requirements/luxottica.json')
-    data = json.loads(f.read())
-    f.close()
-
-    store = Store()
-    store.link = data['url']
-    store.username = data['username']
-    store.password = data['password']
-    store.login_flag = True
-
-    result_filename = 'requirements/Luxottica Results.json'
-
+    # create directories
+    if not os.path.exists('requirements'): os.makedirs('requirements')
     if not os.path.exists('Logs'): os.makedirs('Logs')
-
+    if not os.path.exists('Images'): os.makedirs('Images')
+    
+    start_json_filename = 'Start.json'
+    credentails_filename = 'requirements/credentails.json'
+    json_results_filename = 'requirements/json_results.json'
+    excel_results_filename = 'Results.xlsx'
+    
+    # remove old files
+    if os.path.exists(json_results_filename): os.remove(json_results_filename)
+    if os.path.exists(excel_results_filename): os.remove(excel_results_filename)
     log_files = glob.glob('Logs/*.txt')
     if len(log_files) > 5:
         oldest_file = min(log_files, key=os.path.getctime)
         os.remove(oldest_file)
         log_files = glob.glob('Logs/*.txt')
-
-    scrape_time = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
-    logs_filename = f'Logs/Logs {scrape_time}.txt'
-
-    chrome_path = ''
-    if not chrome_path:
-        chrome_path = ChromeDriverManager().install()
-        if 'chromedriver.exe' not in chrome_path:
-            chrome_path = str(chrome_path).split('/')[0].strip()
-            chrome_path = f'{chrome_path}\\chromedriver.exe'
-    
-    Luxottica_Scraper(DEBUG, result_filename, logs_filename, chrome_path).controller(store, brands)
-    
     for filename in glob.glob('Images/*'): os.remove(filename)
-    data = read_data_from_json_file(DEBUG, result_filename)
-    os.remove(result_filename)
 
-    saving_picture_in_excel(data)
-except Exception as e:
-    if DEBUG: print('Exception: '+str(e))
-    else: pass
+
+    if os.path.exists(start_json_filename):
+        json_data = json.loads(read_file(start_json_filename))
+        
+        if 'brands' in json_data:
+            brands = json_data.get('brands')
+
+            if os.path.exists(credentails_filename):
+                credentails_json_data = json.loads(read_file(credentails_filename))
+
+                store = Store()
+                store.link = credentails_json_data.get('url')
+                store.username = credentails_json_data.get('username')
+                store.password = credentails_json_data.get('password')
+                store.login_flag = True
+
+                scrape_time = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
+                logs_filename = f'Logs/Logs {scrape_time}.txt'
+                Luxottica_Scraper(DEBUG, json_results_filename, logs_filename, chrome_path).controller(store, brands)
+                
+                data = read_data_from_json_file(DEBUG, json_results_filename)
+                
+                saving_picture_in_excel(data, excel_results_filename)
+
+            else: print(f'No {credentails_filename} file found')
+        else: print(f'No brands found in {start_json_filename} file')
+    else: print(f'No {start_json_filename} file found')
+    
+except Exception as e: print('Exception: '+str(e))
+
+# DEBUG = True
+# try:
+#     pathofpyfolder = os.path.realpath(sys.argv[0])
+#     # get path of Exe folder
+#     path = pathofpyfolder.replace(pathofpyfolder.split('\\')[-1], '')
+#     # download chromedriver.exe with same version and get its path
+#     # if os.path.exists('chromedriver.exe'): os.remove('chromedriver.exe')
+#     if os.path.exists('Luxottica Results.xlsx'): os.remove('Luxottica Results.xlsx')
+
+#     # chromedriver_autoinstaller.install(path)
+#     if '.exe' in pathofpyfolder.split('\\')[-1]: DEBUG = False
+    
+#     f = open('Luxottica start.json')
+#     json_data = json.loads(f.read())
+#     f.close()
+
+#     brands = json_data['brands']
+
+    
+#     f = open('requirements/luxottica.json')
+#     data = json.loads(f.read())
+#     f.close()
+
+#     store = Store()
+#     store.link = data['url']
+#     store.username = data['username']
+#     store.password = data['password']
+#     store.login_flag = True
+
+#     result_filename = 'requirements/Luxottica Results.json'
+
+#     if not os.path.exists('Logs'): os.makedirs('Logs')
+
+#     log_files = glob.glob('Logs/*.txt')
+#     if len(log_files) > 5:
+#         oldest_file = min(log_files, key=os.path.getctime)
+#         os.remove(oldest_file)
+#         log_files = glob.glob('Logs/*.txt')
+
+#     scrape_time = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
+#     logs_filename = f'Logs/Logs {scrape_time}.txt'
+
+#     chrome_path = ''
+#     if not chrome_path:
+#         chrome_path = ChromeDriverManager().install()
+#         if 'chromedriver.exe' not in chrome_path:
+#             chrome_path = str(chrome_path).split('/')[0].strip()
+#             chrome_path = f'{chrome_path}\\chromedriver.exe'
+    
+#     Luxottica_Scraper(DEBUG, result_filename, logs_filename, chrome_path).controller(store, brands)
+    
+#     for filename in glob.glob('Images/*'): os.remove(filename)
+#     data = read_data_from_json_file(DEBUG, result_filename)
+#     os.remove(result_filename)
+
+#     saving_picture_in_excel(data)
+# except Exception as e:
+#     if DEBUG: print('Exception: '+str(e))
+#     else: pass

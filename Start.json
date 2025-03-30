@@ -1,9 +1,9 @@
 {
     "brands": [
         {
-            "brand": "Arnette",
-            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/arnette",
-            "glasses_type": ["Sunglasses", "Eyeglasses"]
+            "name": "Oakley",
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/oakley",
+            "glasses_type": ["Sunglasses", "Sunglasses Kids", "Eyeglasses", "Eyeglasses Kids", "Goggles and helmets", "Goggles and helmets kids"]
         }
     ]
 }

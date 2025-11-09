@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import sys
 import json
@@ -572,19 +573,6 @@ class Luxottica_Scraper:
         for _ in range(0, 10):
             try:
                 if url:
-
-                    # if '/login' in self.browser.current_url:
-                    #     for _ in range(0, 30):
-                    #         try:
-                    #             if self.wait_until_element_found(5, 'xpath', '//input[@name="username"]'):
-                    #                 self.browser.find_element(By.XPATH, '//input[@name="username"]')
-                    #                 if self.login(username, password):
-                    #                     sleep(10)
-                    #                     break
-                    #                 else: sleep(0.4)
-                    #             elif self.wait_until_element_found(5, 'xpath', 'button[data-element-id^="Categories_sunglasses_ViewAll"]'): break
-                    #         except: sleep(0.5)
-                    # else:
                     self.wait_until_element_found(30, 'xpath', "//span/button[contains(text(),'Brands')]")
                     ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'Brands')]")).perform()
                     sleep(0.5)
@@ -657,15 +645,7 @@ class Luxottica_Scraper:
                     product_number = str(product_div.get_attribute('data-description')).strip()
                     product_name = str(product_div.find_element(By.CSS_SELECTOR, 'div[class^="TileHeader__Header"] > div > span').text).strip()
                     total_varinats_for_product = str(product_div.find_element(By.CSS_SELECTOR, 'div[class^="Tile__ColorSizeContainer"] > div > span').text).strip()
-                
-                # if '&pageNumber=' not in self.browser.current_url: 
-                #     if self.wait_until_element_found(1, 'css_selector', 'button > svg[style="transform: rotate(270deg);"]') and len(product_div) == 23: break
-                #     elif not self.wait_until_element_found(1, 'css_selector', 'button > svg[style="transform: rotate(270deg);"]'): break
-                #     else: sleep(1)
-                # elif '&pageNumber=' in self.browser.current_url: 
-                #     if self.wait_until_element_found(1, 'css_selector', 'button > svg[style="transform: rotate(270deg);"]') and len(product_div) == 24: break
-                #     elif not self.wait_until_element_found(1, 'css_selector', 'button > svg[style="transform: rotate(270deg);"]'): break
-                #     else: sleep(1)
+
                 break
             except: sleep(0.5)
         return product_divs
@@ -765,7 +745,6 @@ class Luxottica_Scraper:
                 response = requests.get(url=url, headers=headers)
                 if response.status_code == 200:
                     json_data = json.loads(response.text)
-                    # print(json_data['data']['catalogEntryView'])
                     for index, variant in enumerate(json_data['data']['catalogEntryView'][0]['variants']):
                         try:
                             name = ''
@@ -773,24 +752,7 @@ class Luxottica_Scraper:
                             uniqueID = variant['uniqueID']
                             try: name = variant['name']
                             except: pass
-                            # sizes, colors, lens_properties, lens_colors = [], [], [], []
-                            # for attribute in variant['attributes']:
-                            #     if attribute['identifier'] == 'DL_SIZE_CODE':
-                            #         for value in attribute['values']:
-                            #             size = value['value']
-                            #             sizes.append(size)
-                            #     elif attribute['identifier'] == 'FRONT_COLOR_DESCRIPTION':
-                            #         for value in attribute['values']:
-                            #             color = value['value']
-                            #             colors.append(color)
-                            #     elif attribute['identifier'] == 'LENS_PROPERTIES':
-                            #         for value in attribute['values']:
-                            #             lens_property = value['value']
-                            #             lens_properties.append(lens_property)
-                            #     elif attribute['identifier'] == 'LENS_COLOR_DESCRIPTION':
-                            #         for value in attribute['values']:
-                            #             lens_color = value['value']
-                            #             lens_colors.append(lens_color)
+                          
 
                             variants.append({'sequence': (index+1), 'partNumber': partNumber, 'name': name, 'uniqueID': uniqueID})
                         except: pass
@@ -886,237 +848,6 @@ class Luxottica_Scraper:
                 f.write(f'\n{log}')
         except: pass
 
-#     def get_all_variants(self, div, nbr_of_varinats: str) -> list[dict]:
-#         variants = []
-#         try:
-#             self.open_variants_box(div)
-#             self.go_back_to_first_variant()
-#             while len(variants) < int(nbr_of_varinats):
-#                 try:
-#                     new_variants = self.get_variants_data()
-#                     for new_variant in new_variants:
-#                         if new_variant not in variants: variants.append(new_variant)
-#                     if new_variants: self.move_to_next_varinats_grid()
-#                 except:
-#                     sleep(0.3)
-#             self.browser.find_element(By.CSS_SELECTOR, 'div[class="icon-container"] > div[class^="IconButton__Container"] > button').click()
-#         except Exception as e:
-#             if self.DEBUG: print(f'Exception in get_variants: {str(e)}')
-#             self.print_logs(f'Exception in get_variants: {str(e)}')
-#         finally: return variants
-
-#     def get_variants_data(self):
-#         variants = []
-#         for _ in range(0, 30):
-#             try:
-#                 variants_divs = self.browser.find_elements(By.CSS_SELECTOR, 'div[data-element-id="Variants"]')
-#                 if len(variants_divs) == 2:
-#                     variants_grids = variants_divs[1].find_elements(By.CSS_SELECTOR, 'div[class^="ExpandedTile__TilesSection"] > div')
-                            
-#                     for variants_grid in variants_grids:
-#                         frame_code, url, img_url = '', '', ''
-#                         sizes = []
-#                         inner_divs = variants_grid.find_elements(By.CSS_SELECTOR, 'div[class^="Tile__StyledTile"] > div')
-                        
-#                         try:frame_code = str(inner_divs[0].find_element(By.CSS_SELECTOR, 'div[class^="TileHeader__Header"] > div > button').text).strip().replace('/', '-')
-#                         except: pass
-
-#                         try:
-#                             for _ in range(0, 40):
-#                                 for _ in range(0, 20):
-#                                     try: 
-#                                         inner_divs[0].find_element(By.CSS_SELECTOR, 'a[class^="Tile__ImageContainer"] > img').get_attribute('src')
-#                                         break
-#                                     except: sleep(0.1)
-#                                 img_url = str(inner_divs[0].find_element(By.CSS_SELECTOR, 'a[class^="Tile__ImageContainer"] > img').get_attribute('src'))
-#                                 if '/static/media/placeholder' not in img_url: break
-#                                 else: sleep(0.3)
-#                         except: pass
-
-
-#                         try: url = str(variants_grid.find_element(By.CSS_SELECTOR, 'a[class^="Tile__ImageContainer"]').get_attribute('href')).strip()
-#                         except: pass
-#                         if frame_code and url:
-#                             json_data = { 'frame_code': frame_code, 'url': url, 'img_url': img_url }
-#                             if json_data not in variants:
-#                                 variants.append(json_data)
-#                     break
-#             except:
-#                 sleep(0.3)
-#         return variants
-
-#     def open_variants_box(self, div) -> None:
-#         for _ in range(0, 30):
-#             try:
-#                 variants_divs = self.browser.find_elements(By.CSS_SELECTOR, 'div[data-element-id="Variants"]')
-#                 if len(variants_divs) != 2:
-#                     div.find_element(By.CSS_SELECTOR, 'div[class^="Tile__SeeAllContainer"] > div > button').click()
-#                 else: break
-#             except: sleep(0.3)
-
-#     def go_back_to_first_variant(self) -> None:
-#         while self.is_css_selector_found('div[class^="CarouselNavBar__PrevButtonLateral"]'):
-#             try:
-#                 prev_btn_div = self.browser.find_element(By.CSS_SELECTOR, 'div[class^="CarouselNavBar__PrevButtonLateral"]')
-#                 prev_btn_div.find_element(By.TAG_NAME, 'button').click()
-#                 sleep(0.5)
-#             except: pass
-    
-#     def is_css_selector_found(self, css_selector) -> bool:
-#         try:
-#             self.browser.find_element(By.CSS_SELECTOR, css_selector)
-#             return True
-#         except: return False
-
-#     def get_frame_color(self, product: Product) -> None:
-#         for _ in range(0, 40):
-#             try:
-#                 product.frame_color = str(self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PDPVariantColumn__ProductModel"] > span').text).strip()
-#                 if product.frame_color: product.frame_color = str(product.frame_color).lower().replace(str(product.frame_code).strip().lower().replace('-', '/'), '').strip()
-#                 if product.frame_color[0] == '-': product.frame_color = str(product.frame_color[1:]).strip().title()
-#                 else: product.frame_color = str(product.frame_color).strip().title()
-#             except: 
-#                 try:
-#                     for div in self.browser.find_elements(By.CSS_SELECTOR, 'div[class^="TileLensInfo__PropertiesContainer"] > div'):
-#                         if 'color' in str(div.find_element(By.TAG_NAME, 'p').text).strip().lower():
-#                             product.frame_color = str(div.find_element(By.TAG_NAME, 'span').text).strip().title()
-#                             break
-#                 except: sleep(0.1)
-#             if product.frame_color: break
-
-#     def get_lens_color(self, product: Product):
-#         for _ in range(0, 30):
-#             try:
-#                 for div in self.browser.find_elements(By.CSS_SELECTOR, 'div[class^="TileLensInfo__PropertiesContainer"] > div'):
-#                         if 'lens color' in str(div.find_element(By.TAG_NAME, 'p').text).strip().lower():
-#                             product.lens_color = str(div.find_element(By.TAG_NAME, 'span').text).strip().title()
-#                             break
-#             except: sleep(0.1)
-#             if product.lens_color: break
-
-#     def get_metafeilds(self, img_url: str) -> Metafields:
-#         metafields = Metafields()
-        
-#         if not img_url or '/static/media/placeholder' in img_url: self.get_image_url(metafields)
-#         else: metafields.img_url = img_url
-
-#         # if metafields.img_url: self.get_360_images(metafields)
-        
-#         # for _ in range(0, 50):
-#         try:
-#             lens_sun_feature, polarized, photochromic = '', '', ''
-#             for div in self.browser.find_elements(By.CSS_SELECTOR, 'div[class^="PDPProductDetails__DetailLine"]'):
-#                 spans = div.find_elements(By.TAG_NAME, 'span')
-#                 if 'front material' in str(spans[0].text).strip().lower():
-#                     metafields.frame_material = str(spans[1].text).strip().title()
-#                 elif 'shape' in str(spans[0].text).strip().lower():
-#                     metafields.frame_shape = str(spans[1].text).strip().title()
-#                 elif 'gender' in str(spans[0].text).strip().lower():
-#                     metafields.for_who = str(spans[1].text).strip().title()
-#                 elif 'lens material' in str(spans[0].text).strip().lower():
-#                     metafields.lens_material = str(spans[1].text).strip().title()
-#                 elif 'lens sun feature' in str(spans[0].text).strip().lower():
-#                     lens_sun_feature = str(spans[1].text).strip().title()
-#                 elif 'polarized' in str(spans[0].text).strip().lower():
-#                     polarized = str(spans[1].text).strip()
-#                 elif 'photochromic' in str(spans[0].text).strip().lower():
-#                     photochromic = str(spans[1].text).strip()
-
-#             if ',' in polarized: polarized = str(polarized).split(',')[0].strip()
-
-#             if str(photochromic).strip().lower() == 'false' and str(polarized).strip().lower() == 'false':
-#                 metafields.lens_technology = str(lens_sun_feature).strip().title()
-#             else:
-#                 if str(photochromic).strip().lower() == 'true' and str(polarized).strip().lower() == 'true':
-#                     metafields.lens_technology = 'Photochromic Polarized'
-#                 elif str(photochromic).strip().lower() == 'true' and str(polarized).strip().lower() == 'false':
-#                     metafields.lens_technology = 'Photochromic'
-#                 elif str(photochromic).strip().lower() == 'false' and str(polarized).strip().lower() == 'true':
-#                     metafields.lens_technology = 'Polarized'
-#             # break
-#         except: pass
-#                 # try: ActionChains(self.browser).move_to_element(self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PDPProductDetails__DetailLine"]')).perform()
-#                 # except: pass
-#                 # sleep(0.3)
-        
-#         return metafields
-
-#     def get_image_url(self, metafields: Metafields) -> None:
-#         for _ in range(0, 30):
-#             try:
-#                 metafields.img_url = self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PDPGlassesColumn__ImageContainer"]').find_element(By.TAG_NAME, 'img').get_attribute('src')
-#                 if '/static/media/placeholder' not in metafields.img_url:
-#                     sleep(1)
-#                     metafields.img_url = str(metafields.img_url).strip()
-#                     break
-#                 else: sleep(0.1)
-#             except: sleep(0.1)
-           
-#     def get_size_variants(self, product: Product) -> None:
-#         for _ in range(0, 20):
-#             try:
-#                 for index, div in enumerate(self.browser.find_elements(By.CSS_SELECTOR, 'div[class^="SizeContainer__AddSizeContainer"]')):
-#                     variant = Variant()
-#                     variant.position = (index + 1)
-#                     try: variant.title = str(div.find_element(By.CSS_SELECTOR, 'div[class^="AddSize__SizeValue"]').text).strip()
-#                     except: pass
-#                     variant.sku = f'{product.number} {product.frame_code} {variant.title}'
-#                     if '-' in variant.sku: variant.sku = str(variant.sku).replace('-', '/')
-#                     try:
-#                         src = div.find_element(By.CSS_SELECTOR, 'div[class^="Tooltip__StyledContainer"] > div[class^="AvailabilityStatus"] > img').get_attribute('src')
-#                         if '/Green.' in src: variant.inventory_quantity = 1
-#                         else: variant.inventory_quantity = 0
-#                     except: pass
-#                     variant.found_status = 1
-#                     try: variant.listing_price = str(self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PriceTile__ContainerAlignLeft"] > span[color="primary"]').text).strip().replace('€', '')
-#                     except: pass
-#                     try: variant.wholesale_price = str(self.browser.find_element(By.CSS_SELECTOR, 'div[class^="PriceTile__ContainerAlignRight"] > span[color="primary"]').text).strip().replace('€', '')
-#                     except: pass
-#                     product.variants = variant
-#                 break
-#             except: sleep(0.1)
-
-#     def printProgressBar(self, iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-#         """
-#         Call in a loop to create terminal progress bar
-#         @params:
-#             iteration   - Required  : current iteration (Int)
-#             total       - Required  : total iterations (Int)
-#             prefix      - Optional  : prefix string (Str)
-#             suffix      - Optional  : suffix string (Str)
-#             decimals    - Optional  : positive number of decimals in percent complete (Int)
-#             length      - Optional  : character length of bar (Int)
-#             fill        - Optional  : bar fill character (Str)
-#             printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-#         """
-#         percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-#         filledLength = int(length * iteration // total)
-#         bar = fill * filledLength + '-' * (length - filledLength)
-#         print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
-#         # Print New Line on Complete
-#         if iteration == total: 
-#             print()
-
-#     def create_thread(self, varinat: dict, brand: str, glasses_type: str, headers: dict, tokenValue: str) -> None:
-#         thread_name = "Thread-"+str(self.thread_counter)
-#         self.thread_list.append(myScrapingThread(self.thread_counter, thread_name, self, varinat, brand,  glasses_type, headers, tokenValue))
-#         self.thread_list[self.thread_counter].start()
-#         self.thread_counter += 1
-
-#     def is_thread_list_complted(self) -> bool:
-#         for obj in self.thread_list:
-#             if obj.status == "in progress":
-#                 return False
-#         return True
-
-#     def wait_for_thread_list_to_complete(self) -> None:
-#         while True:
-#             result = self.is_thread_list_complted()
-#             if result: 
-#                 self.thread_counter = 0
-#                 self.thread_list.clear()
-#                 break
-#             else: sleep(1)
 
 def read_file(filename: str):
     f = open(filename)
@@ -1131,113 +862,64 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
         if files:
             f = open(files[-1])
             json_data = json.loads(f.read())
-            products = []
 
             for json_d in json_data:
                 number, frame_code, brand, img_url, frame_color, lens_color = '', '', '', '', '', ''
-                # product = Product()
                 brand = json_d['brand']
                 number = str(json_d['number']).strip().upper()
                 if '/' in number: number = number.replace('/', '-').strip()
-                # product.name = str(json_d['name']).strip().upper()
                 frame_code = str(json_d['frame_code']).strip().upper()
                 if '/' in frame_code: frame_code = frame_code.replace('/', '-').strip()
                 frame_color = str(json_d['frame_color']).strip().title()
-                # product.lens_code = str(json_d['lens_code']).strip().upper()
                 lens_color = str(json_d['lens_color']).strip().title()
-                # product.status = str(json_d['status']).strip().lower()
-                # product.type = str(json_d['type']).strip().title()
-                # product.url = str(json_d['url']).strip()
-                # metafields = Metafields()
                 
                 for json_metafiels in json_d['metafields']:
-                    # if json_metafiels['key'] == 'for_who':metafields.for_who = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'product_size':metafields.product_size = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'activity':metafields.activity = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'lens_material':metafields.lens_material = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'graduabile':metafields.graduabile = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'interest':metafields.interest = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'lens_technology':metafields.lens_technology = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'frame_material':metafields.frame_material = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'frame_shape':metafields.frame_shape = str(json_metafiels['value']).strip().title()
-                    # elif json_metafiels['key'] == 'gtin1':metafields.gtin1 = str(json_metafiels['value']).strip().title()
                     if json_metafiels['key'] == 'img_url':img_url = str(json_metafiels['value']).strip()
-                    # elif json_metafiels['key'] == 'img_360_urls':
-                    #     value = str(json_metafiels['value']).strip()
-                    #     if '[' in value: value = str(value).replace('[', '').strip()
-                    #     if ']' in value: value = str(value).replace(']', '').strip()
-                    #     if "'" in value: value = str(value).replace("'", '').strip()
-                    #     for v in value.split(','):
-                    #         metafields.img_360_urls = str(v).strip()
-                # product.metafields = metafields
                 for json_variant in json_d['variants']:
-                    sku, price = '', ''
-                    # variant = Variant()
-                    # variant.position = json_variant['position']
-                    # variant.title = str(json_variant['title']).strip()
                     sku = str(json_variant['sku']).strip().upper()
                     if '/' in sku: sku = sku.replace('/', '-').strip()
                     inventory_status = json_variant['inventory_status']
-                    # variant.found_status = json_variant['found_status']
                     wholesale_price = str(json_variant['wholesale_price']).strip()
                     listing_price = str(json_variant['listing_price']).strip()
                     barcode_or_gtin = str(json_variant['barcode_or_gtin']).strip()
-                    # variant.size = str(json_variant['size']).strip()
-                    # variant.weight = str(json_variant['weight']).strip()
-                    # product.variants = variant
                     img_url = img_url.replace('impolicy=MYL_EYE&wid=262', 'impolicy=MYL_EYE&wid=600')
                     image_filename = f'Images/{sku.replace("/", "_")}.jpg'
                     if not os.path.exists(image_filename):
-                        # print(image_filename)
-                        image_attachment = download_image(img_url, logs_filename)
-                        if image_attachment:
-                            with open(image_filename, 'wb') as f:
-                                for chunk in image_attachment:
-                                    f.write(chunk)
-                            # with open(image_filename, 'wb') as f: f.write(image_attachment)
-                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, img_url])
+                        download_and_save_image(img_url, logs_filename, image_filename)
+                       
+                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, image_filename])
     except Exception as e:
         if DEBUG: print(f'Exception in read_data_from_json_file: {e}')
         else: pass
     finally: return data
 
-def download_image(url: str, logs_filename: str) -> str:
-    image_attachment = ''
+def download_and_save_image(url: str, logs_filename: str, image_filename: str) -> None:
     try:
         headers = {
-            'authority': 'myluxottica-im2.luxottica.com',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'accept-language': 'en-US,en;q=0.9',
-            'cache-control': 'max-age=0',
-            # 'if-modified-since': 'Wed, 17 Jan 2024 08:18:34 GMT',
-            # 'if-none-match': '"0x8DBC6B2A2C83730"',
-            'sec-ch-ua': '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'document',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-site': 'none',
-            'sec-fetch-user': '?1',
-            'upgrade-insecure-requests': '1',
-            # 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
         }
         counter = 0
         while True:
             try:
-                response = requests.get(url=url, headers=headers, timeout=50)
-                if response.status_code == 200:
-                    # image_attachment = base64.b64encode(response.content)
-                    # image_attachment = response.content
-                    image_attachment = response
-                    break
-                else: print_logs(f'{response.status_code} found for downloading image', logs_filename)
+                response = requests.get(url=url, headers=headers, timeout=60)
+                response.raise_for_status()
+
+                image = Image.open(BytesIO(response.content))
+                image.verify()
+
+                image = Image.open(BytesIO(response.content)).convert("RGB")
+                image.save(image_filename, "JPEG")
+
+                break
             except Exception as e: 
-                print(e)
+                print_logs(f'Exception in download_image request: {str(e)} for {url}', logs_filename)
                 sleep(0.3)
             counter += 1
-            if counter == 10: break
-    except Exception as e: print(f'Exception in download_image: {str(e)}')
-    finally: return image_attachment
+            if counter == 10:
+                print_logs(f'Max retries reached for {url}', logs_filename)
+                break
+    except Exception as e: print_logs(f'Exception in download_image: {str(e)}')
+
 
 def image_download_process(image_filename, image_url):
     try:  
@@ -1278,27 +960,22 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
             worksheet.cell(row=new_index, column=9, value=d[8])
             worksheet.cell(row=new_index, column=10, value=d[9])
 
-            # image_url = d[9]
             image_filename = f'Images/{d[5].replace("/", "_")}.jpg'
             
-            # print(image_filename, image_url)
 
             if os.path.exists(image_filename):
                 try:
                     im = Image.open(image_filename)
-                    # if image is WebP save it as JPEG and open it again
-                    if im.format_description == 'WebP image':
-                        im.convert("RGB")
-                        im.save(image_filename, "jpeg")
-                        im = Image.open(image_filename)
                         
                     width, height = im.size
                     worksheet.row_dimensions[new_index].height = height
+
                     worksheet.add_image(Imag(image_filename), anchor='K'+str(new_index))
-                except Exception as e: 
+                except Exception as e:
+                    print(f'Exception in adding image to excel: {str(e)} for {image_filename}') 
+                    input('wait')
                     pass
-                
-        
+                    
         workbook.save(excel_results_filename)
     except Exception as e: print(f'Exception in saving_picture_in_excel: {str(e)}')   
 

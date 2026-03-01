@@ -872,6 +872,7 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
                 if '/' in frame_code: frame_code = frame_code.replace('/', '-').strip()
                 frame_color = str(json_d['frame_color']).strip().title()
                 lens_color = str(json_d['lens_color']).strip().title()
+                glasses_type = str(json_d['type']).strip().title()
                 
                 for json_metafiels in json_d['metafields']:
                     if json_metafiels['key'] == 'img_url':img_url = str(json_metafiels['value']).strip()
@@ -887,7 +888,7 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
                     if not os.path.exists(image_filename):
                         download_and_save_image(img_url, logs_filename, image_filename)
                        
-                    data.append([number, frame_code, frame_color, lens_color, brand, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, image_filename])
+                    data.append([number, frame_code, frame_color, lens_color, brand, glasses_type, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, image_filename])
     except Exception as e:
         if DEBUG: print(f'Exception in read_data_from_json_file: {e}')
         else: pass
@@ -940,12 +941,13 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
         worksheet.cell(row=1, column=3, value='Color Frame')
         worksheet.cell(row=1, column=4, value='Color Lens')
         worksheet.cell(row=1, column=5, value='Brand')
-        worksheet.cell(row=1, column=6, value='SKU')
-        worksheet.cell(row=1, column=7, value='Wholesale Price')
-        worksheet.cell(row=1, column=8, value='Listing Price')
-        worksheet.cell(row=1, column=9, value='UPC')
-        worksheet.cell(row=1, column=10, value='Item Status')
-        worksheet.cell(row=1, column=11, value="Image")
+        worksheet.cell(row=1, column=6, value='Glasses Type')
+        worksheet.cell(row=1, column=7, value='SKU')
+        worksheet.cell(row=1, column=8, value='Wholesale Price')
+        worksheet.cell(row=1, column=9, value='Listing Price')
+        worksheet.cell(row=1, column=10, value='UPC')
+        worksheet.cell(row=1, column=11, value='Item Status')
+        worksheet.cell(row=1, column=12, value="Image")
 
         for index, d in enumerate(data):
             new_index = index + 2
@@ -959,6 +961,7 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
             worksheet.cell(row=new_index, column=8, value=d[7])
             worksheet.cell(row=new_index, column=9, value=d[8])
             worksheet.cell(row=new_index, column=10, value=d[9])
+            worksheet.cell(row=new_index, column=11, value=d[10])
 
             image_filename = f'Images/{d[5].replace("/", "_")}.jpg'
             
@@ -970,7 +973,7 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
                     width, height = im.size
                     worksheet.row_dimensions[new_index].height = height
 
-                    worksheet.add_image(Imag(image_filename), anchor='K'+str(new_index))
+                    worksheet.add_image(Image(image_filename), anchor='L'+str(new_index))
                 except Exception as e:
                     print(f'Exception in adding image to excel: {str(e)} for {image_filename}') 
                     input('wait')

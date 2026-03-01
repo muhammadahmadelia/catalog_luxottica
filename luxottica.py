@@ -922,14 +922,14 @@ def download_and_save_image(url: str, logs_filename: str, image_filename: str) -
     except Exception as e: print_logs(f'Exception in download_image: {str(e)}')
 
 
-def image_download_process(image_filename, image_url):
-    try:  
-        print('Downloading image: ', image_filename)
-        image_attachment = download_image(image_url)
-        if image_attachment:
-            with open(image_filename, 'wb') as f: f.write(image_attachment)
-    except Exception as e:
-        print(f'Exception in image_download_process: {str(e)} for {image_url}')
+# def image_download_process(image_filename, image_url):
+#     try:  
+#         print('Downloading image: ', image_filename)
+#         image_attachment = download_image(image_url)
+#         if image_attachment:
+#             with open(image_filename, 'wb') as f: f.write(image_attachment)
+#     except Exception as e:
+#         print(f'Exception in image_download_process: {str(e)} for {image_url}')
 
 def saving_picture_in_excel(data: list, excel_results_filename: str):
     try:

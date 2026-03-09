@@ -1,0 +1,5 @@
+pip install requests==2.28.1
+pip install pillow==9.3.0
+pip install openpyxl==3.0.10
+pip install selenium==4.7.2
+from selenium import webdriver

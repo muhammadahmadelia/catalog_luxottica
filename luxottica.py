@@ -365,14 +365,14 @@ class Luxottica_Scraper:
             
             for brand_with_type in brands_with_types:
                 login_flag = False
-                if '/login' in self.browser.current_url:
-                    if self.login(store.link, store.username, store.password):
-                        sleep(10)
-                        login_flag = True
-                    else: 
-                        print(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
-                        self.print_logs(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
-                else: login_flag = True
+                # if '/login' in self.browser.current_url:
+                if self.login(store.link, store.username, store.password):
+                    sleep(10)
+                    login_flag = True
+                else: 
+                    print(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
+                    self.print_logs(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
+                # else: login_flag = True
 
                 if login_flag:
                     cookies, dtPC = '', ''
@@ -385,7 +385,7 @@ class Luxottica_Scraper:
 
                     for glasses_type_index, glasses_type in enumerate(glasses_types):
                         
-                        brand_url = self.select_category(brand_url_json, glasses_type, store.username, store.password)
+                        brand_url = self.select_category(brand, brand_url_json, glasses_type, store.username, store.password)
                         if brand_url:
                             total_products = self.get_total_products_for_brand()
                         
@@ -568,15 +568,29 @@ class Luxottica_Scraper:
             if self.DEBUG: print(f'Exception in accept_cookies_after_login: {str(e)}')
 
     # function to select the category of brand        
-    def select_category(self, url: str, glasses_type: str, username: str, password: str) -> str:
+    def select_category(self, brand: str, url: str, glasses_type: str, username: str, password: str) -> str:
         brand_url = ''
         for _ in range(0, 10):
             try:
                 if url:
+
+                    # if '/login' in self.browser.current_url:
+                    #     for _ in range(0, 30):
+                    #         try:
+                    #             if self.wait_until_element_found(5, 'xpath', '//input[@name="username"]'):
+                    #                 self.browser.find_element(By.XPATH, '//input[@name="username"]')
+                    #                 if self.login(username, password):
+                    #                     sleep(10)
+                    #                     break
+                    #                 else: sleep(0.4)
+                    #             elif self.wait_until_element_found(5, 'xpath', 'button[data-element-id^="Categories_sunglasses_ViewAll"]'): break
+                    #         except: sleep(0.5)
+                    # else:
                     self.wait_until_element_found(30, 'xpath', "//span/button[contains(text(),'Brands')]")
-                    ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'Brands')]")).perform()
+                    ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'Brands')]")).click().perform()
                     sleep(0.5)
-                    self.browser.get(url)
+                    # self.browser.get(url)
+                    ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, f"//button[contains(@class, 'BrandButton')]/span[contains(text(), '{brand}')]/parent::button")).click().perform()
                     self.wait_until_browsing()
                     sleep(5)
 
@@ -588,6 +602,7 @@ class Luxottica_Scraper:
                         elif glasses_type == 'Eyeglasses Kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
                         elif glasses_type == 'Goggles and helmets': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
                         elif glasses_type == 'Goggles and helmets kids': category_css_selector = 'button[data-element-id^="Categories_children_ViewAll"]'
+                        elif glasses_type == 'AI Glasses': category_css_selector = 'button[data-element-id^="Categories_AI"]'
 
                         if self.wait_until_element_found(20, 'css_selector', category_css_selector):
                             element = self.browser.find_element(By.CSS_SELECTOR, category_css_selector)

@@ -1,9 +1,9 @@
 {
     "brands": [
         {
-            "name": "Ray-Ban",
-            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/ray-ban",
-            "glasses_type": ["AI Glasses"]
+            "name": "Dolce&Gabbana",
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/dolce-gabbana",
+            "glasses_type": ["Eyeglasses", "Sunglasses", "Eyeglasses Kids", "Sunglasses Kids"]
         }
     ]
 }

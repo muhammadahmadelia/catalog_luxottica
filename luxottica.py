@@ -23,6 +23,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service as ChromeService
 
+import pillow_avif  # <-- REQUIRED, enables AVIF decoding
+from openpyxl.drawing.image import Image as XLImage
+
 
 class myScrapingThread(threading.Thread):
     def __init__(self, thread_id, name, scraper, varinat: dict, brand: str, glasses_type: str, headers: dict, tokenValue: str):
@@ -978,20 +981,24 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
             worksheet.cell(row=new_index, column=10, value=d[9])
             worksheet.cell(row=new_index, column=11, value=d[10])
 
-            image_filename = f'Images/{d[5].replace("/", "_")}.jpg'
+            image = f'Images/{d[6].replace("/", "_")}.jpg'
             
 
-            if os.path.exists(image_filename):
+            if os.path.exists(image):
                 try:
-                    im = Image.open(image_filename)
+                    image = Image.open(image)
                         
-                    width, height = im.size
-                    worksheet.row_dimensions[new_index].height = height
+                    # width, height = im.size
+                    # worksheet.row_dimensions[new_index].height = height
 
-                    worksheet.add_image(Image(image_filename), anchor='L'+str(new_index))
+                    # worksheet.add_image(Image(image_filename), anchor='L'+str(new_index))
+                    width, height = image.size
+                    worksheet.row_dimensions[new_index].height = height * 0.75
+                    xl_img = XLImage(image)
+                    worksheet.add_image(xl_img, f"L{new_index}")
                 except Exception as e:
-                    print(f'Exception in adding image to excel: {str(e)} for {image_filename}') 
-                    input('wait')
+                    print(f'Exception in adding image to excel: {str(e)} for {image}') 
+                    # input('wait')
                     pass
                     
         workbook.save(excel_results_filename)

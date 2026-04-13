@@ -593,7 +593,7 @@ class Luxottica_Scraper:
                     ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, "//span/button[contains(text(),'Brands')]")).click().perform()
                     sleep(0.5)
                     # self.browser.get(url)
-                    ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, f"//button[contains(@class, 'BrandButton')]/span[contains(text(), '{brand}')]/parent::button")).click().perform()
+                    ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, f"//button[contains(@class, 'BrandButton')]/span[text() ='{brand}']/parent::button")).click().perform()
                     self.wait_until_browsing()
                     sleep(5)
 

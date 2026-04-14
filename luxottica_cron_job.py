@@ -299,14 +299,15 @@ class Luxottica_Scraper:
             self.initialize_browser(store.link)
             
             for brand_with_type in brands_with_types:
-                login_flag = False
-                # if '/login' in self.browser.current_url:
-                if self.login(store.link, store.username, store.password):
-                    sleep(10)
-                    login_flag = True
-                else: 
-                    print(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
-                    self.print_logs(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
+                # login_flag = False
+                login_flag = True if '/homepage' in self.browser.current_url else False
+                if not login_flag:
+                    if self.login(store.link, store.username, store.password):
+                        sleep(10)
+                        login_flag = True
+                    else: 
+                        print(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
+                        self.print_logs(f'Failed to login \nURL: {store.link}\nUsername: {str(store.username)}\nPassword: {str(store.password)}')
                 # else: login_flag = True
 
                 if login_flag:

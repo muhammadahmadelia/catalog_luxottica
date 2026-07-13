@@ -136,3 +136,4 @@ requirements/*.json
 *.ico
 *.bat
 *.xlsx
+credentails.json

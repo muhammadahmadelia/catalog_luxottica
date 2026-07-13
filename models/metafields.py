@@ -9,6 +9,7 @@ class Metafields:
         self.__graduabile = ''
         self.__interest = ''
         self.__lens_technology = ''
+        self.__collection = ''
         self.__frame_material = ''
         self.__frame_shape = ''
         self.__gtin1 = ''
@@ -87,6 +88,14 @@ class Metafields:
     @lens_technology.setter
     def lens_technology(self, lens_technology: str):
         self.__lens_technology = lens_technology
+
+    @property
+    def collection(self) -> str:
+        return self.__collection
+    
+    @collection.setter
+    def collection(self, collection: str):
+        self.__collection = collection
 
     @property
     def frame_material(self) -> str:

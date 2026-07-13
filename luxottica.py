@@ -142,6 +142,7 @@ class myScrapingThreadController:
             metafields.frame_shape = properties['frame_shape'] if 'frame_shape' in properties else ''
             metafields.frame_material = properties['frame_material'] if 'frame_material' in properties else ''
             metafields.lens_technology = properties['lens_technology'] if 'lens_technology' in properties else ''
+            metafields.collection = properties['collection'] if 'collection' in properties else ''
             metafields.img_url = properties['img_url'] if 'img_url' in properties else ''
             
             
@@ -212,6 +213,7 @@ class myScrapingThreadController:
                 if response.status_code == 200:
                     json_data = json.loads(response.text)
                     frame_color, lens_color, for_who, lens_material, frame_shape, frame_material, lens_technology = '', '', '', '', '', '', ''
+                    collection = ''
                     img_url = f"{str(json_data['data']['catalogEntryView'][0]['fullImage']).strip()}?impolicy=MYL_EYE&wid=600"
                     for attribute in json_data['data']['catalogEntryView'][0]['attributes']:
                         values = []
@@ -241,6 +243,8 @@ class myScrapingThreadController:
                             if attribute['values'][0]['value'] == 'TRUE':
                                 if lens_technology: lens_technology += str(' POLARIZED').title()
                                 else: lens_technology = str('POLARIZED').title()
+                        elif attribute['identifier'] == 'EW_LAUNCH_CODE':
+                            collection = attribute['values'][0]['value'] if len(attribute['values']) > 0 else ''
 
                     if not str(lens_technology).strip():
                         for attribute in json_data['data']['catalogEntryView'][0]['attributes']:
@@ -285,6 +289,7 @@ class myScrapingThreadController:
                         'frame_shape': frame_shape if frame_shape else '', 
                         'frame_material': frame_material if frame_material else '', 
                         'lens_technology': lens_technology if lens_technology else '',
+                        'collection': collection if collection else '',
                         'sizes': sizes if sizes else []
                     }
                 else: self.print_logs(f'Status code: {response.status_code} for id and tokenValue')
@@ -845,7 +850,8 @@ class Luxottica_Scraper:
                         { 'key': 'lens_technology', 'value': product.metafields.lens_technology }, 
                         { 'key': 'frame_material', 'value': product.metafields.frame_material }, 
                         { 'key': 'frame_shape', 'value': product.metafields.frame_shape },
-                        { 'key': 'gtin1', 'value': product.metafields.gtin1 }, 
+                        { 'key': 'collection', 'value': product.metafields.collection },
+                        { 'key': 'gtin1', 'value': product.metafields.gtin1 },
                         { 'key': 'img_url', 'value': product.metafields.img_url },
                         { 'key': 'img_360_urls', 'value': product.metafields.img_360_urls }
                     ],
@@ -883,6 +889,7 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
 
             for json_d in json_data:
                 number, frame_code, brand, img_url, frame_color, lens_color = '', '', '', '', '', ''
+                collection = ''
                 brand = json_d['brand']
                 number = str(json_d['number']).strip().upper()
                 if '/' in number: number = number.replace('/', '-').strip()
@@ -893,7 +900,9 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
                 glasses_type = str(json_d['type']).strip().title()
                 
                 for json_metafiels in json_d['metafields']:
+                    if json_metafiels['key'] == 'collection': collection = str(json_metafiels['value']).strip()
                     if json_metafiels['key'] == 'img_url':img_url = str(json_metafiels['value']).strip()
+
                 for json_variant in json_d['variants']:
                     sku = str(json_variant['sku']).strip().upper()
                     if '/' in sku: sku = sku.replace('/', '-').strip()
@@ -906,7 +915,7 @@ def read_data_from_json_file(DEBUG, result_filename: str, logs_filename: str) ->
                     if not os.path.exists(image_filename):
                         download_and_save_image(img_url, logs_filename, image_filename)
                        
-                    data.append([number, frame_code, frame_color, lens_color, brand, glasses_type, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, image_filename])
+                    data.append([number, frame_code, frame_color, lens_color, brand, glasses_type, sku, wholesale_price, listing_price, barcode_or_gtin, inventory_status, collection, image_filename])
     except Exception as e:
         if DEBUG: print(f'Exception in read_data_from_json_file: {e}')
         else: pass
@@ -965,7 +974,8 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
         worksheet.cell(row=1, column=9, value='Listing Price')
         worksheet.cell(row=1, column=10, value='UPC')
         worksheet.cell(row=1, column=11, value='Item Status')
-        worksheet.cell(row=1, column=12, value="Image")
+        worksheet.cell(row=1, column=12, value='Collection')
+        worksheet.cell(row=1, column=13, value="Image")
 
         for index, d in enumerate(data):
             new_index = index + 2
@@ -980,6 +990,7 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
             worksheet.cell(row=new_index, column=9, value=d[8])
             worksheet.cell(row=new_index, column=10, value=d[9])
             worksheet.cell(row=new_index, column=11, value=d[10])
+            worksheet.cell(row=new_index, column=12, value=d[11])
 
             image = f'Images/{d[6].replace("/", "_")}.jpg'
             
@@ -995,7 +1006,7 @@ def saving_picture_in_excel(data: list, excel_results_filename: str):
                     width, height = image.size
                     worksheet.row_dimensions[new_index].height = height * 0.75
                     xl_img = XLImage(image)
-                    worksheet.add_image(xl_img, f"L{new_index}")
+                    worksheet.add_image(xl_img, f"M{new_index}")
                 except Exception as e:
                     print(f'Exception in adding image to excel: {str(e)} for {image}') 
                     # input('wait')

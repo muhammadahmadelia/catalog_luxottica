@@ -532,13 +532,13 @@ class Luxottica_Scraper:
 
                     if self.browser.current_url == url:
                         category_css_selector = ''
-                        if glasses_type == 'Sunglasses': category_css_selector = 'button[data-element-id^="Categories_sunglasses_"]'
-                        elif glasses_type == 'Sunglasses Kids': category_css_selector = 'button[data-element-id^="Categories_sunglasses-kids"]'
-                        elif glasses_type == 'Eyeglasses': category_css_selector = 'button[data-element-id^="Categories_eyeglasses_"]'
-                        elif glasses_type == 'Eyeglasses Kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
-                        elif glasses_type == 'Goggles and helmets': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
-                        elif glasses_type == 'Goggles and helmets kids': category_css_selector = 'button[data-element-id^="Categories_children_ViewAll"]'
-                        elif glasses_type == 'AI Glasses': category_css_selector = 'button[data-element-id^="Categories_AI"]'
+                        if str(glasses_type).strip().lower() == 'sunglasses': category_css_selector = 'button[data-element-id^="Categories_sunglasses_"]'
+                        elif str(glasses_type).strip().lower() == 'sunglasses kids': category_css_selector = 'button[data-element-id^="Categories_sunglasses-kids"]'
+                        elif str(glasses_type).strip().lower() == 'eyeglasses': category_css_selector = 'button[data-element-id^="Categories_eyeglasses_"]'
+                        elif str(glasses_type).strip().lower() == 'eyeglasses kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
+                        elif str(glasses_type).strip().lower() == 'goggles and helmets': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
+                        elif str(glasses_type).strip().lower() == 'goggles and helmets kids': category_css_selector = 'button[data-element-id^="Categories_children_ViewAll"]'
+                        elif str(glasses_type).strip().lower() == 'AI Glasses': category_css_selector = 'button[data-element-id^="Categories_AI"]'
 
                         if self.wait_until_element_found(20, 'css_selector', category_css_selector):
                             element = self.browser.find_element(By.CSS_SELECTOR, category_css_selector)

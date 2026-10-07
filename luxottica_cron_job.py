@@ -20,6 +20,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
 
 
@@ -506,6 +507,7 @@ class Luxottica_Scraper:
     # function to select the category of brand        
     def select_category(self, brand: str, url: str, glasses_type: str, username: str, password: str) -> str:
         brand_url = ''
+        
         for _ in range(0, 10):
             try:
                 if url:
@@ -529,7 +531,6 @@ class Luxottica_Scraper:
                     ActionChains(self.browser).move_to_element(self.browser.find_element(By.XPATH, f"//button[contains(@class, 'BrandButton')]/span[contains(text(), '{brand}')]/parent::button")).click().perform()
                     self.wait_until_browsing()
                     sleep(5)
-
                     if self.browser.current_url == url:
                         category_css_selector = ''
                         if str(glasses_type).strip().lower() == 'sunglasses': category_css_selector = 'button[data-element-id^="Categories_sunglasses_"]'
@@ -538,7 +539,15 @@ class Luxottica_Scraper:
                         elif str(glasses_type).strip().lower() == 'eyeglasses kids': category_css_selector = 'button[data-element-id^="Categories_eyeglasses-kids"]'
                         elif str(glasses_type).strip().lower() == 'goggles and helmets': category_css_selector = 'button[data-element-id^="Categories_adult_ViewAll"]'#'button[data-element-id^="Categories_gogglesHelmets"]'
                         elif str(glasses_type).strip().lower() == 'goggles and helmets kids': category_css_selector = 'button[data-element-id^="Categories_children_ViewAll"]'
-                        elif str(glasses_type).strip().lower() == 'AI Glasses': category_css_selector = 'button[data-element-id^="Categories_AI"]'
+                        elif str(glasses_type).strip().lower() == 'ai glasses': category_css_selector = 'button[data-element-id^="Categories_AI"]'
+
+                        # print(category_css_selector)
+
+                        # for _ in range(0, 10):
+                        #     if self.wait_until_element_found(5, 'css_selector', category_css_selector):
+                        #         break
+                        #     else:
+                        #         ActionChains(self.browser).send_keys(Keys.PAGE_DOWN).perform()
 
                         if self.wait_until_element_found(20, 'css_selector', category_css_selector):
                             element = self.browser.find_element(By.CSS_SELECTOR, category_css_selector)

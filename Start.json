@@ -1,9 +1,11 @@
 {
     "brands": [
         {
-            "name": "Arnette",
-            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/arnette",
-            "glasses_type": ["Eyeglasses", "Sunglasses"]
+            "name": "Oakley",
+            "url": "https://my.essilorluxottica.com/myl-it/en-GB/preplp/oakley",
+            "glasses_type": [
+                "AI Glasses"
+            ]
         }
     ]
 }
